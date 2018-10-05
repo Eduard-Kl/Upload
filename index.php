@@ -7,12 +7,15 @@
       Select file to upload:
       <input type="file" name="fileToUpload" id="fileToUpload"/>
       <br>
-      Password (optional):
+
+      Download password (optional):
       <input type="password" name="optionalPassword" id="optionalPassword"/>
       <br>
-      Remove file metadata? (warning: this changes the file checksum)
+
+      Remove file metadata? (Warning: this changes the file checksum!)
       <input type="checkbox" name="removeMetadata" id="removeMetadata" checked/>
       <br>
+      
       <input type="submit" name="submitButton" value="Upload"/>
     </form>
   </body>

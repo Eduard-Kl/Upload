@@ -1,5 +1,6 @@
 <?php
-//require_once 'helperFunctions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 ?>
 
 <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?f=' . htmlspecialchars($_GET['f']);?>" method="post" enctype="multipart/form-data">
@@ -12,13 +13,16 @@
 <?php
 // If button 'Submit password' was clicked
 if(isset($_POST['submitPassword'])){
+
     $fileKey = $_GET['f'];
+
     if(DEBUG == true)
         echo '<p>Debug: ' . $fileKey . '</p>';
+
     $typedInPassword = $_POST['optionalPassword'];
 
     // Open database connection
-    require_once 'DB.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
     $db = DB::getConnection();
 
     // Fetch from database (find $fileName and $correctPassword based on $fileKey)
@@ -50,9 +54,13 @@ if(isset($_POST['submitPassword'])){
         $statement = $db -> prepare("UPDATE file SET downloads = downloads + 1 WHERE keycode = :fileKey");
         $statement->execute( array('fileKey' => $fileKey));
 
+        // Update last accessed date
+        $statement = $db -> prepare('UPDATE file SET lastView = ' . date('Y-m-d') . ' WHERE keycode = :fileKey');
+        $statement -> execute(array('fileKey' => $fileKey));
+
         readfile($targetFileFullPath); 
     }else{
-        echo '<p>You entered a wrong Password. Please Try Again.</p>';
+        echo '<p>You entered a wrong download password. Please Try Again.</p>';
     }
 
     // Close connection

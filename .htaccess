@@ -1,0 +1,16 @@
+# Remove .php from url
+RewriteRule ^upload/?$ upload.php 
+RewriteRule ^download/?$ download.php
+RewriteRule ^passcheck/?$ passcheck.php 
+RewriteRule ^report/?$ report.php
+RewriteRule ^index/?$ index.php
+RewriteRule ^delete/?$ delete.php
+
+
+# Allow  download/123456  instead of  download.php?f=123456
+Options +FollowSymLinks -MultiViews
+RewriteEngine On
+RewriteBase /
+RewriteRule ^download/([0-9]+)/?$ /download?f=$1 [L,QSA,NC]
+RewriteRule ^delete/([0-9]+)/?$ /delete?code=$1 [L,QSA,NC]
+RewriteRule ^passcheck/([0-9]+)/?$ /passcheck?f=$1 [L,QSA,NC]

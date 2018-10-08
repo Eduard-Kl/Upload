@@ -14,7 +14,7 @@ if($conn->connect_error){
 $sql = 'CREATE TABLE file (
     keycode VARCHAR(6) NOT NULL,
     filename VARCHAR(255) NOT NULL,
-    password VARCHAR(40),
+    password VARCHAR(32),
     downloads INT DEFAULT 0 NOT NULL,
     uploadDate DATE NOT NULL,
     lastView DATE NOT NULL,

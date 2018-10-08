@@ -1,9 +1,9 @@
 <html>
-  <head>
-    <title>Upload</title>
-  </head>
+  <?php
+  require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
+  ?>
   <body>
-    <form action="upload.php" method="post" enctype="multipart/form-data">
+    <form action="upload" method="post" enctype="multipart/form-data">
       Select file to upload:
       <input type="file" name="fileToUpload" id="fileToUpload"/>
       <br>
@@ -16,6 +16,7 @@
       <input type="checkbox" name="removeMetadata" id="removeMetadata" checked/>
       <br>
       
+      Maximum file size is 1 GB.
       <input type="submit" name="submitButton" value="Upload"/>
     </form>
   </body>

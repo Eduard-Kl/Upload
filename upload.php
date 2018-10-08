@@ -1,6 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
 
 function generateRandomKey(){
 
@@ -28,21 +29,32 @@ function generateRandomKey(){
 
 function checkFile(){
 	
-	global $fileName;
-	
-	// Check file size
-	if($_FILES["fileToUpload"]["size"] > MAXFILESIZE){
-		echo '<p>Error: Maximum allowed file size is ' .  MAXFILESIZE . ' bytes (' . humanFilesize(MAXFILESIZE) . ')</p>';
-		return false;
-	}
+	global $fileName, $optionalPassword;
 
-	// Check file name length
-	if(strlen($fileName) > 255){
-		echo '<p>Error: Maximum file name length is 255 characters.</p>';
+    // Check file name length
+    // Limit on linux is 142 characters. 142 - 7 = 135. 7 for file key and '-'
+	if(strlen($fileName) > 135){
+		echo '<p>Error: Maximum file name length is 135 characters.</p>';
 		return false;
-	}
+    }
+    
+    // Check password length
+	if(strlen($optionalPassword) > 32){
+		echo '<p>Error: Maximum password length is 32 characters.</p>';
+		return false;
+    }
 	
 	return true;
+}
+
+if(!isset($_POST['submitButton'])){
+    toHomePage();
+}
+
+// Button 'Upload' was pressed with no file selected
+if( $_FILES['fileToUpload']['name'] == '' && $_FILES['fileToUpload']['type'] == '' ){
+    //exit('You need to select a file to upload.');
+    toHomePage();
 }
 
 // With extension
@@ -52,12 +64,10 @@ if(isset($_POST["optionalPassword"])){
     $optionalPassword = $_POST["optionalPassword"];
 }
 
-// Full path with extension
-$targetFileFullPath = DIRECTORY . $fileName;
+if(checkFile() === false){
+    exit();
+}
 
-if(DEBUG == true)
-    echo "<p>DEBUG: " . DIRECTORY . " " . $fileName . " " . $optionalPassword . " " . $targetFileFullPath . "</p>";
-	
 // Open database connection
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 $db = DB::getConnection();
@@ -66,42 +76,42 @@ $db = DB::getConnection();
 $fileKey = generateRandomKey();
 $fileDeleteCode = $fileKey . rand(0, 9);
 
-// Upload
-if(checkFile() === true){
-    if(DEBUG == true)
-        echo "<p>DEBUG: " . $_FILES["fileToUpload"]["tmp_name"] . " " . $targetFileFullPath . "</p>";
-		
-    if(move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFileFullPath)){
-        if(isset($_POST['removeMetadata'])){
-            $output = shell_exec('exiftool -all= "' . $targetFileFullPath . '" -overwrite_original');
-            if(DEBUG == true){
-                echo $output;
-                echo '<p>DEBUG: metadata removed.</p>';
-            }
-        }
-		
-		// Inserting into DB
-		$statement = $db -> prepare('INSERT INTO file (keycode, filename, password, uploadDate, lastView, deleteCode, size)	VALUES(:keycode, :filename, :password, :uploadDate, :lastView, :deleteCode, :size)');
-        $statement -> execute(array('keycode' => $fileKey, 'filename' => $fileName, 'password' => $optionalPassword, 'uploadDate' => date('Y-m-d'), 'lastView' => date('Y-m-d'), 'deleteCode' => $fileDeleteCode, 'size' => humanFilesize(filesize($targetFileFullPath))));
-        
-        if(DEBUG == true){
-            echo '<p>DEBUG: ' . $fileKey . ' ' . $fileName . ' ' . $optionalPassword . ' ' . date('Y-m-d') . ' ' . $fileDeleteCode . ' ' . humanFilesize(filesize($targetFileFullPath));
-        }
+// Full path with extension and $fileKey to allow different files with same name
+$targetFileFullPath = DIRECTORY . $fileKey . '-' . $fileName;
 
-		// Close connection
-		$db = null;
-		
-        echo '<p>The file '. $fileName . ' has been uploaded.</p>';
-		
-        if($optionalPassword != NULL){
-            echo '<p>Your Download link: <a href="passcheck.php?f=' . $fileKey . '">click</a></p>';
+if(DEBUG)
+    echo '<p>DEBUG: ' . DIRECTORY . ' ' . $fileName . ' ' . $optionalPassword . $_FILES['fileToUpload']['tmp_name'] . ' ' . $targetFileFullPath . '</p>';
+
+// Upload
+if(move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $targetFileFullPath)){
+    
+    if(isset($_POST['removeMetadata'])){
+        $utput = shell_exec('exiftool -all= "' . $targetFileFullPath . '" -overwrite_original');
+        if(DEBUG){
+            echo '<p>DEBUG: metadata removed. Status: ' . $output . '</p>';
         }
-        else{
-            echo '<p>Your Download link: <a href="download.php?f=' . $fileKey . '">click</a></p>';
-        }
-        echo '<p>Delete link: <a href="delete.php?code=' . $fileDeleteCode . '">click</a></p>';
-    }else{
-        exit('Sorry, there was an error uploading your file.');
     }
+		
+	// Inserting into DB
+	$statement = $db -> prepare('INSERT INTO file (keycode, filename, password, uploadDate, lastView, deleteCode, size)	VALUES(:keycode, :filename, :password, :uploadDate, :lastView, :deleteCode, :size)');
+    $statement -> execute(array('keycode' => $fileKey, 'filename' => $fileName, 'password' => $optionalPassword, 'uploadDate' => date('Y-m-d'), 'lastView' => date('Y-m-d'), 'deleteCode' => $fileDeleteCode, 'size' => humanFilesize(filesize($targetFileFullPath))));
+    // KEYLENGTH + 1 since name is in format fileKey-fileName
+
+    if(DEBUG){
+        echo '<p>DEBUG: ' . $fileKey . ' ' . $fileName . ' ' . $optionalPassword . ' ' . date('Y-m-d') . ' ' . $fileDeleteCode . ' ' . humanFilesize(filesize($targetFileFullPath));
+    }
+
+    writeLog("UP\t" . $targetFileFullPath);
+
+	// Close connection
+	$db = null;
+		
+    echo '<p>The file '. $fileName . ' has been uploaded.</p>';		
+    echo '<p>Your download link: <a href="download/' . $fileKey . '">click</a></p>';
+    echo '<p>Delete link: <a href="delete/' . $fileDeleteCode . '">click</a></p>';
+}else{
+
+    // File is too big. Auto check via php.ini
+    exit('Sorry, there was an error uploading your file.');
 }
 ?>

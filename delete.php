@@ -1,6 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
 
 // Get the fine name based on delete code
 function getFileName(string $deleteCode){
@@ -21,6 +22,10 @@ function getFileName(string $deleteCode){
 	return $row['filename'];
 }
 
+if(!isset($_GET['code'])){
+	toHomePage();
+}
+
 // Delete link was called. Ask for confirmation
 if( isset($_GET['code']) && !isset($_POST['submitDelete']) ){
 	
@@ -38,11 +43,11 @@ if( isset($_GET['code']) && !isset($_POST['submitDelete']) ){
 		echo '<p>Error: Wrong delete code. File not found.</p>';
 		exit();
 	}
-	
-	if(DEBUG == true)
+
+	if(DEBUG)
 		echo '<p>DEBUG: file ' . $fileName . ' to be deleted.</p>';
 	?>
-	<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?code=' . htmlspecialchars($_GET['code']);?>" method="post" enctype="multipart/form-data">
+	<form action="<?php echo htmlspecialchars($_GET['code']);?>" method="post" enctype="multipart/form-data">
 		<p>Are you sure you want to delete the file	<?php echo $fileName;?>?</p>
 		<input type="submit" name="submitDelete" value="Delete file"/>
 		<input type="hidden" name="fileName" value="<?php echo $fileName;?>"/>
@@ -64,15 +69,16 @@ if( isset($_GET['code']) && isset($_POST['submitDelete']) ){
 	// Close connection
 	$db = null;
 	
-    $targetFileFullPath = DIRECTORY . $_POST['fileName'];
+	// Get file key based on delete code. Remove last character. To be changed later
+    $targetFileFullPath = DIRECTORY . substr($_GET['code'], 0, -1) . '-' . $_POST['fileName'];
     
-    if(DEBUG == true)
-        echo '<p>Debug: ' . $targetFileFullPath . ' is being deleted.</p>';
+    if(DEBUG)
+        echo '<p>DEBUG: ' . $targetFileFullPath . ' is being deleted.</p>';
 	
 	// Delete from drive
 	if(file_exists($targetFileFullPath) && unlink($targetFileFullPath) == true){
 		echo '<p>File ' . $_POST['fileName'] . ' has been deleted.</p>';
-		log('DEL: ' . $targetFileFullPath);
+		writeLog("DEL\t" . $targetFileFullPath);
 	}
 }
 ?>

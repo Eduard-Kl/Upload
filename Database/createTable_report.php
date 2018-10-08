@@ -12,13 +12,15 @@ if($conn->connect_error){
 
 // Create table
 $sql = 'CREATE TABLE report (
+    id INT NOT NULL AUTO_INCREMENT,
     link VARCHAR(255) NOT NULL,
     password VARCHAR(32),
-	name VARCHAR(40),
-	info TEXT NOT NULL,
+    name VARCHAR(40),
+    info TEXT NOT NULL,
     reportDate DATETIME NOT NULL,
-	checked BIT(1) DEFAULT 0 NOT NULL,
-    removed BIT(1) DEFAULT 0 NOT NULL)';
+    checked BOOL DEFAULT 0 NOT NULL,
+    removed BOOL DEFAULT 0 NOT NULL,
+    PRIMARY KEY(id))';
 
 if ($conn->query($sql) === TRUE) {
     echo 'Table "report" created successfully.';

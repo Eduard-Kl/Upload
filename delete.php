@@ -8,13 +8,13 @@ function getFileName(string $deleteCode){
 
 	global $db;
 	
-	// Fetch from database (find file name based on htmlentities(htmlentities($_GET['code'])))
+	// Fetch from database (find file name based on $deleteCode)
 	$statement = $db -> prepare('SELECT filename FROM file WHERE deleteCode = :deleteCode');
 	$statement -> execute(array('deleteCode' => $deleteCode));
 	
 	foreach($statement->fetchAll() as $row){
 		if(DEBUG == true){
-			$targetFileFullPath = DIRECTORY . $row['filename'];		
+			$targetFileFullPath = directory() . $row['filename'];		
 			echo '<p>DEBUG: file ' . $targetFileFullPath . ' found.</p>';
 		}
 	}	
@@ -70,7 +70,7 @@ if( isset($_GET['code']) && isset($_POST['submitDelete']) ){
 	$db = null;
 	
 	// Get file key based on delete code. Remove last character. To be changed later
-    $targetFileFullPath = DIRECTORY . substr(htmlentities($_GET['code']), 0, -1) . '-' . $_POST['fileName'];
+    $targetFileFullPath = directory() . substr(htmlentities($_GET['code']), 0, -1) . '-' . $_POST['fileName'];
     
     if(DEBUG)
         echo '<p>DEBUG: ' . $targetFileFullPath . ' is being deleted.</p>';

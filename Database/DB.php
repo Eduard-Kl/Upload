@@ -20,7 +20,7 @@ class DB{
 				if(DEBUG)
 					echo '<p>DEBUG: PDO created.</p>';
 				// First parameter = 'mysql:host=localhost;dbname=myDB;charset=utf8';
-				DB::$db = new PDO('mysql:host=' . $DBservername . ';dbname=' . $DBname . ';charset=utf8', $DBusername, $DBpassword);
+				DB::$db = new PDO('mysql:host=' . $DBservername . ';dbname=' . $DBname . ';charset=utf8mb4', $DBusername, $DBpassword);
 			} catch(PDOException $e){
 				echo '<p>Connection failed: ' . $e->getMessage() . '</p>';
 				exit();

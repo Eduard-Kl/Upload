@@ -1,5 +1,5 @@
 <?php
-
+require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/databaseInfo.php';
 
 // Create connection
@@ -13,9 +13,9 @@ if($conn->connect_error){
 // Create table
 $sql = 'CREATE TABLE report (
     id INT NOT NULL AUTO_INCREMENT,
-    link VARCHAR(255) NOT NULL,
-    password VARCHAR(32),
-    name VARCHAR(40),
+    link VARCHAR(' . LINKLENGTH . ') NOT NULL,
+    password VARCHAR(' . PASSWORDLENGTH . '),
+    name VARCHAR(' . NAMELENGTH . '),
     info TEXT NOT NULL,
     reportDate DATETIME NOT NULL,
     checked BOOL DEFAULT 0 NOT NULL,

@@ -20,7 +20,7 @@ $statement -> execute(array('fileKey' => $fileKey));
 
 foreach($statement->fetchAll() as $row){
     $fileName = $row['filename'];
-    $targetFileFullPath = DIRECTORY . $fileKey . '-' . $fileName;
+    $targetFileFullPath = directory() . $fileKey . '-' . $fileName;
     $correctPassword = $row['password'];
     if(DEBUG)
         echo '<p>DEBUG: ' . $targetFileFullPath . ' ' . $correctPassword . '</p>';

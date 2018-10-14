@@ -18,20 +18,20 @@ function checkInput(){
 	}
 	
 	// Check link length
-	if(strlen($_POST['link']) > 255){
-		echo '<p>Report link cannot exceed 255 characters.</p>';
+	if(strlen($_POST['link']) > LINKLENGTH){
+		echo '<p>Report link cannot exceed ' . LINKLENGTH . ' characters.</p>';
 		return false;
 	}
 	
 	// Check password length
-	if(strlen($_POST['optionalPassword']) > 32){
-		echo '<p>Password cannot exceed 32 characters.</p>';
+	if(strlen($_POST['optionalPassword']) > PASSWORDLENGTH){
+		echo '<p>Password cannot exceed ' . PASSWORDLENGTH . ' characters.</p>';
 		return false;
 	}
 	
 	// Check name length
-	if(strlen($_POST['name']) > 40){
-		echo '<p>Name cannot exceed 40 characters.</p>';
+	if(strlen($_POST['name']) > NAMELENGTH){
+		echo '<p>Name cannot exceed ' . NAMELENGTH .' characters.</p>';
 		return false;
 	}
 

@@ -2,8 +2,14 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
 
 function writeLog(string $message){
-	$logMessage = date('Y-m-d H:i:s') . ' - ' . $message . PHP_EOL; 
-	file_put_contents(DIRECTORY . date('Y-m-d') . '.log', $logMessage, FILE_APPEND);
+	$logMessage = date('Y-m-d H:i:s') . ' - ' . $message . PHP_EOL;
+	$directory = DIRECTORY . date('Y') . '/Logs/';
+	
+	if(!file_exists($directory)){
+		// Check permissions. 0706?
+		mkdir($directory, 0706, true);
+	}
+	file_put_contents($directory . date('Y-m-d') . '.log', $logMessage, FILE_APPEND);
 }
 
 function humanFilesize($bytes, $decimals = 2){
@@ -50,4 +56,14 @@ function download($db, $fileName, $targetFileFullPath, $fileKey){
 	
 	// Close connection
 	$db = null;
+}
+
+function directory(){
+	$directory = DIRECTORY . date('Y') . '/' . date('m') . '/' . date('d') . '/';
+
+	if(!file_exists($directory)){
+		// Check permissions. 0706?
+		mkdir($directory, 0706, true);
+	}
+	return $directory;
 }

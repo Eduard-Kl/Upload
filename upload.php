@@ -32,15 +32,14 @@ function checkFile(){
 	global $fileName, $optionalPassword;
 
     // Check file name length
-    // Limit on linux is 142 characters. 142 - 7 = 135. 7 for file key and '-'
-	if(strlen($fileName) > 135){
-		echo '<p>Error: Maximum file name length is 135 characters.</p>';
+	if(strlen($fileName) > FILENAMELENGTH){
+		echo '<p>Error: Maximum file name length is ' . FILENAMELENGTH .' characters.</p>';
 		return false;
     }
     
     // Check password length
-	if(strlen($optionalPassword) > 32){
-		echo '<p>Error: Maximum password length is 32 characters.</p>';
+	if(strlen($optionalPassword) > PASSWORDLENGTH){
+		echo '<p>Error: Maximum password length is ' . PASSWORDLENGTH . ' characters.</p>';
 		return false;
     }
 	
@@ -77,10 +76,10 @@ $fileKey = generateRandomKey();
 $fileDeleteCode = $fileKey . rand(0, 9);
 
 // Full path with extension and $fileKey to allow different files with same name
-$targetFileFullPath = DIRECTORY . $fileKey . '-' . $fileName;
+$targetFileFullPath = directory() . $fileKey . '-' . $fileName;
 
 if(DEBUG)
-    echo '<p>DEBUG: ' . DIRECTORY . ' ' . $fileName . ' ' . $optionalPassword . $_FILES['fileToUpload']['tmp_name'] . ' ' . $targetFileFullPath . '</p>';
+    echo '<p>DEBUG: ' . directory() . ' ' . $fileName . ' ' . $optionalPassword . $_FILES['fileToUpload']['tmp_name'] . ' ' . $targetFileFullPath . '</p>';
 
 // Upload
 if(move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $targetFileFullPath)){

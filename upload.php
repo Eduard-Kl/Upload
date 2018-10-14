@@ -106,8 +106,9 @@ if(move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $targetFileFullPath))
 	// Close connection
 	$db = null;
 		
-    echo '<p>The file '. $fileName . ' has been uploaded.</p>';		
-    echo '<p>Your download link: <a href="download/' . $fileKey . '">click</a></p>';
+    echo '<p>The file '. $fileName . ' has been uploaded.</p>';    
+    echo '<p>Download link: <a href="file/' . $fileKey . '">click</a></p>';
+    echo '<p>Direct download link: <a href="download/' . $fileKey . '">click</a></p>';
     echo '<p>Delete link: <a href="delete/' . $fileDeleteCode . '">click</a></p>';
 }else{
 

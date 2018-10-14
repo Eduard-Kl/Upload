@@ -45,7 +45,7 @@ function checkInput(){
 }
 
 ?>
-<form action="report" method="post" enctype="multipart/form-data">
+<form action="<?php echo $_SERVER['PHP_SELF'];?>" method="post" enctype="multipart/form-data">
 	<p>If reporting multiple files, please report them one by one.</p>
 	
 	File to report: *
@@ -61,7 +61,7 @@ function checkInput(){
 	<br>
 	
 	Your message: *
-	<input type="textbox" name="info" value="<?php echo $_POST['info'];?>"/>
+	<input type="textbox" name="info" value=""/>
 	
 	<input type="submit" name="submitButton" value="Report"/>
 	

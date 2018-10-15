@@ -1,6 +1,7 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/databaseInfo.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
 
 // Open database connection
@@ -51,13 +52,13 @@ echo '</tr>';
 foreach($statement->fetchAll() as $row){
 	echo '<form action="' . $_SERVER['PHP_SELF'] . '" method="post" enctype="multipart/form-data"><tr>';
 	
-	echo 	'<td>' . $row['id'] . '</td>';
-	echo 	'<td>' . $row['link'] . '</td>';
-	echo 	'<td>' . $row['name'] . '</td>';
+	echo 	'<td>' . e($row['id']) . '</td>';
+	echo 	'<td>' . e($row['link']) . '</td>';
+	echo 	'<td>' . e($row['name']) . '</td>';
 	
 	// Limit to 255 characters
-	echo 	'<td>' . substr($row['info'], 0, 255) . '</td>';		
-	echo 	'<td>' . $row['reportDate'] . '</td>';
+	echo 	'<td>' . substr(e($row['info']), 0, 255) . '</td>';		
+	echo 	'<td>' . e($row['reportDate']) . '</td>';
 	
 	echo 	'<td><input type="submit" name="submitChecked" value="Check"/></td>';	
 	echo 	'<td><input type="submit" name="submitRemoved" value="Remove"/></td>';

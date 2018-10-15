@@ -4,7 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
 
 if(isset($_GET['f'])){
-	$fileKey = htmlentities($_GET['f']);
+	$fileKey = $_GET['f'];
 }
 else{
     toHomePage();
@@ -33,7 +33,7 @@ if($row['filename'] == null ){
 }
 
 // File info
-echo '<p>' . $fileName . ' ' . $size . '</p>';
+echo '<p>' . e($fileName) . ' ' . $size . '</p>';
 
 // Password protected file
 if($correctPassword != null){

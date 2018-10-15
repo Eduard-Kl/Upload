@@ -4,7 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
 
 if(isset($_GET['f'])){
-	$fileKey = htmlentities($_GET['f']);
+	$fileKey = $_GET['f'];
 }
 else{
     toHomePage();

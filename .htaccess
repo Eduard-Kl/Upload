@@ -1,3 +1,6 @@
+# Forbid directory content listing
+Options -Indexes
+
 # Remove .php from url
 RewriteRule ^upload/?$ upload.php 
 RewriteRule ^download/?$ download.php

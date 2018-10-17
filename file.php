@@ -35,20 +35,25 @@ if($row['filename'] == null ){
 // File info
 echo '<p>' . e($fileName) . ' ' . $size . '</p>';
 
+?>
+<form action="/download/<?php echo $fileKey; ?>" method="post" enctype="multipart/form-data">
+<?php
+
 // Password protected file
 if($correctPassword != null){
-    ?>
-    <form action="/download/<?php echo $fileKey; ?>" method="post" enctype="multipart/form-data">
-        Enter Password:
-        <input type="password" name="optionalPassword" id="optionalPassword"/>
-        <br>
-        <input type="submit" name="submitPassword" value="Submit password"/>
-    </form>
-    <?php
-}
-else{
-    echo '<a href="/download/' . $fileKey . '">Download</a>';
+    echo 'Enter download password';
+    echo '<input type="password" name="optionalPassword"/>';
 }
 
+// Secure download mode checkbox
+?>
+    <br>
+    Secure download mode (experimental)
+    <input type="checkbox" name="optionalSecureDownload" unchecked/>
+    <br>
+    <input type="submit" name="download" value="Download"/>
+</form>
+
+<?php
 // Close connection
 $db = null;

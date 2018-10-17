@@ -28,7 +28,7 @@ function toHomePage(){
     exit();
 }
 
-function download($db, $fileName, $targetFileFullPath, $fileKey){
+function download($db, $fileName, $targetFileFullPath, $fileKey, $secureDownload){
 
     header('Content-Description: File Transfer');
     header('Content-Type: application/force-download');
@@ -49,10 +49,17 @@ function download($db, $fileName, $targetFileFullPath, $fileKey){
 	// Update last accessed date
 	$statement = $db -> prepare('UPDATE file SET lastView = ' . date('Y-m-d') . ' WHERE keycode = :fileKey');
     $statement -> execute(array('fileKey' => $fileKey));
-    
-    writeLog("DOWN\t" . $targetFileFullPath);
+	
+	if(!$secureDownload){
+		writeLog("DOWN\t" . $targetFileFullPath);
+	}
 	
 	readfile($targetFileFullPath);
+
+	// Remove zip file
+	if($secureDownload){
+		shell_exec('rm "' . $targetFileFullPath . '"');
+	}
 	
 	// Close connection
 	$db = null;
@@ -109,9 +116,15 @@ function createzip($targetFileFullPath){
 
 	/*
 	Examples:
+		Create dummy files
 		base64 /dev/urandom | head -c 4000000 > 4mb.txt
 		dd if=/dev/zero of=/tmp/dummy123456 bs=1024 count=1
+		
+		Create zip
 		zip -9 /tmp/DL.zip /tmp/file.txt /tmp/dummy123456
+		
+		Rename files inside of a zip
+		printf "@ myfile.txt\n@=myfile2.txt\n" | zipnote -w archive.zip'
 	*/
 
 	$fileKey = substr(basename($targetFileFullPath), 0, KEYLENGTH);
@@ -123,9 +136,23 @@ function createzip($targetFileFullPath){
 	//shell_exec('dd if=/dev/urandom of="/tmp/' . $fileKey . '-DELETE ME" bs=' . addBytes(filesize($targetFileFullPath)) . ' count=1');
 
 	$zip = workingDirectory() . $fileKey . '.zip';
+	$dummy = workingDirectory() . $fileKey . '-DELETE ME.txt';
 
 	// Create zip. -9 = highest compression level, -j = don't keep folder structure
-	shell_exec('zip -9 -j ' . $zip . ' "' . $targetFileFullPath . '" "' . workingDirectory() . $fileKey . '-DELETE ME.txt"');
+	shell_exec('zip -9 -j ' . $zip . ' "' . $targetFileFullPath . '" "' . $dummy . '"');
+	
+	// Rename the files inside the zip file. Remove the "KEYCODE-" from the beginning of the file name
+	shell_exec('printf "@ ' . basename($targetFileFullPath) . '\n@=' . substr(basename($targetFileFullPath), KEYLENGTH + 1) . '\n" | zipnote -w ' . $zip);
+	
+	// Original file could be named "DELETE ME.txt". zip can't contain files with the same name
+	if(substr(basename($targetFileFullPath), KEYLENGTH + 1) != 'DELETE ME.txt'){
+		shell_exec('printf "@ ' . basename($dummy) . '\n@=' . substr(basename($dummy), KEYLENGTH + 1) . '\n" | zipnote -w ' . $zip);
+	}
+
+	writeLog("SECDOWN\t" . $targetFileFullPath);
+	
+	// Remove dummy file
+	shell_exec('rm "' . $dummy . '"');
 
 	return $zip;
 }

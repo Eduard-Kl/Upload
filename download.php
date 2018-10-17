@@ -32,14 +32,18 @@ if(file_exists($targetFileFullPath)){
     // Password protected file
     if($correctPassword != null){
 
-        // If button 'Submit password' was clicked
-        if(isset($_POST['submitPassword']) && $correctPassword == $_POST['optionalPassword']){
+        if($correctPassword == $_POST['optionalPassword']){
             
             if(DEBUG)
                 echo '<p>DEBUG: ' . $correctPassword . ' ' . $_POST['optionalPassword'] . ' ' . $targetFileFullPath . '</p>';
 
             // Download (correct password)
-            download($db, $fileName, $targetFileFullPath, $fileKey);
+            if(isset($_POST['optionalSecureDownload'])){
+                download($db, pathinfo($fileName, PATHINFO_FILENAME) . '.zip', createzip($targetFileFullPath), $fileKey, true);
+            }
+            else{
+                download($db, $fileName, $targetFileFullPath, $fileKey, false);
+            }
         }
         else{
             header('Location: /file/' . $fileKey);
@@ -47,7 +51,12 @@ if(file_exists($targetFileFullPath)){
     }
     // Download (no password)
     else{
-        download($db, $fileName, $targetFileFullPath, $fileKey);
+        if(isset($_POST['optionalSecureDownload'])){
+            download($db, pathinfo($fileName, PATHINFO_FILENAME) . '.zip', createzip($targetFileFullPath), $fileKey, true);
+        }
+        else{
+            download($db, $fileName, $targetFileFullPath, $fileKey, false);
+        }
     }
 }
 else{

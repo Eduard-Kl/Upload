@@ -8,6 +8,7 @@ define('DELETECODELENGTH', KEYLENGTH + 1);
 // Limit on linux is 142 characters. fileName is in format "KEYLENGTH-FILENAMELENGTH"
 define('FILENAMELENGTH', 142 - KEYLENGTH - 1);
 define('PASSWORDLENGTH', 32);
+define('LOCATIONLENGTH', 191);
 
 // Table report
 define('LINKLENGTH', 191);

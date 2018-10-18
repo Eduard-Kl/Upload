@@ -38,8 +38,6 @@ echo '<p>Unhandled reports: ' . $statement->fetchColumn() . '.</p>';
 
 // Fetch reports
 $statement = $db -> query('SELECT id, link, name, info, reportDate FROM report WHERE checked  = 0  ORDER BY reportDate LIMIT 10');
-//$statement = $db -> prepare('SELECT id, link, name, info, reportDate FROM report WHERE checked  = 0  ORDER BY reportDate LIMIT 10');
-//$statement -> execute();
 
 // Draw table
 echo '<table><tr>';

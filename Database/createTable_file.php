@@ -18,6 +18,7 @@ $sql = 'CREATE TABLE file (
     downloads INT DEFAULT 0 NOT NULL,
     uploadDate DATE NOT NULL,
     lastView DATE NOT NULL,
+    location VARCHAR(' . LOCATIONLENGTH . ') NOT NULL,
     deleteCode VARCHAR(' . DELETECODELENGTH . ') NOT NULL,
     size VARCHAR(10) NOT NULL,
     PRIMARY KEY(keycode))';

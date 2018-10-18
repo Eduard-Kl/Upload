@@ -28,7 +28,7 @@ function toHomePage(){
     exit();
 }
 
-function download($db, $fileName, $targetFileFullPath, $fileKey, $secureDownload){
+function download($db, $fileName, $targetFileFullPath, $fileKey, $secureDownload = false){
 
     header('Content-Description: File Transfer');
     header('Content-Type: application/force-download');
@@ -42,13 +42,9 @@ function download($db, $fileName, $targetFileFullPath, $fileKey, $secureDownload
     ob_clean();
     flush();
 	
-    // Increase number of downloads
-	$statement = $db -> prepare('UPDATE file SET downloads = downloads + 1 WHERE keycode = :fileKey');
+    // Increase number of downloads and update last accessed date
+	$statement = $db -> prepare('UPDATE file SET downloads = downloads + 1, lastView = "' . date('Y-m-d') . '" WHERE keycode = :fileKey');
 	$statement -> execute(array('fileKey' => $fileKey));
-	
-	// Update last accessed date
-	$statement = $db -> prepare('UPDATE file SET lastView = ' . date('Y-m-d') . ' WHERE keycode = :fileKey');
-    $statement -> execute(array('fileKey' => $fileKey));
 	
 	if(!$secureDownload){
 		writeLog("DOWN\t" . $targetFileFullPath);
@@ -56,9 +52,11 @@ function download($db, $fileName, $targetFileFullPath, $fileKey, $secureDownload
 	
 	readfile($targetFileFullPath);
 
-	// Remove zip file
+	// Remove zip file and temp directory
 	if($secureDownload){
+		// $targetFileFullPath is now a .zip containing two files
 		shell_exec('rm "' . $targetFileFullPath . '"');
+		shell_exec('rmdir ' . dirname($targetFileFullPath));
 	}
 	
 	// Close connection
@@ -76,7 +74,7 @@ function directory(){
 	return $directory;
 }
 
-// Working directory for temp files. To be changed later
+// Working directory for temp files. To be changed later. Into RamDisk?
 function workingDirectory(){
 	$directory = DIRECTORY . date('Y') . '/';
 
@@ -126,33 +124,42 @@ function createzip($targetFileFullPath){
 		Rename files inside of a zip
 		printf "@ myfile.txt\n@=myfile2.txt\n" | zipnote -w archive.zip'
 	*/
+	
+	// Each secure download request gets its own temporary directory. This needs to be unique. Has nothing to do with file key
+	$tempDirectory = workingDirectory() . substr(md5(rand()), 0, 6) . '/';
+	
+	// Create temp directory inside working directory
+	// Check permissions. 0747? 0706 doesn't work
+	mkdir($tempDirectory, 0747, true);
 
-	$fileKey = substr(basename($targetFileFullPath), 0, KEYLENGTH);
+	$fileKey = substr(basename($targetFileFullPath), 0, KEYLENGTH);	
+
+	$zip = $tempDirectory . $fileKey . '.zip';
+
+	// Original file could be named "DELETE ME.txt". zip can't contain files with the same name
+	if(substr(basename($targetFileFullPath), KEYLENGTH + 1) == 'DELETE ME.txt'){
+		$dummy = $tempDirectory . 'DELETE ME.log';
+	}
+	else{
+		$dummy = $tempDirectory . 'DELETE ME.txt';		
+	}
 
 	// Create dummy 1
-	shell_exec('base64 /dev/urandom | head -c ' . addBytes(filesize($targetFileFullPath)) . ' > "' . workingDirectory() . $fileKey . '-DELETE ME.txt"');
+	shell_exec('base64 /dev/urandom | head -c ' . addBytes(filesize($targetFileFullPath)) . ' > "' . $dummy . '"');
 
 	// Create dummy 2
 	//shell_exec('dd if=/dev/urandom of="/tmp/' . $fileKey . '-DELETE ME" bs=' . addBytes(filesize($targetFileFullPath)) . ' count=1');
-
-	$zip = workingDirectory() . $fileKey . '.zip';
-	$dummy = workingDirectory() . $fileKey . '-DELETE ME.txt';
 
 	// Create zip. -9 = highest compression level, -j = don't keep folder structure
 	shell_exec('zip -9 -j ' . $zip . ' "' . $targetFileFullPath . '" "' . $dummy . '"');
 	
 	// Rename the files inside the zip file. Remove the "KEYCODE-" from the beginning of the file name
 	shell_exec('printf "@ ' . basename($targetFileFullPath) . '\n@=' . substr(basename($targetFileFullPath), KEYLENGTH + 1) . '\n" | zipnote -w ' . $zip);
-	
-	// Original file could be named "DELETE ME.txt". zip can't contain files with the same name
-	if(substr(basename($targetFileFullPath), KEYLENGTH + 1) != 'DELETE ME.txt'){
-		shell_exec('printf "@ ' . basename($dummy) . '\n@=' . substr(basename($dummy), KEYLENGTH + 1) . '\n" | zipnote -w ' . $zip);
-	}
 
-	writeLog("SECDOWN\t" . $targetFileFullPath);
-	
 	// Remove dummy file
 	shell_exec('rm "' . $dummy . '"');
+	
+	writeLog("SDOWN\t" . $targetFileFullPath);
 
 	return $zip;
 }

@@ -72,7 +72,7 @@ function checkInput(){
 <?php
 
 // Button 'Report' was clicked and all information is ok
-if(isset($_POST['submitButton']) && checkInput() === true){		
+if(isset($_POST['submitButton']) && checkInput() === true){
 	
 	// Open database connection
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';

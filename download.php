@@ -14,13 +14,14 @@ else{
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 $db = DB::getConnection();
 
-// Fetch from database (find $fileName, $correctPassword based on $fileKey)
-$statement = $db -> prepare("SELECT filename, password FROM file WHERE keycode = :fileKey");
+// Fetch from database (get file info based on $fileKey)
+$statement = $db -> prepare("SELECT filename, password, uploadDate, location FROM file WHERE keycode = :fileKey");
 $statement -> execute(array('fileKey' => $fileKey));
 
 foreach($statement->fetchAll() as $row){
     $fileName = $row['filename'];
-    $targetFileFullPath = directory() . $fileKey . '-' . $fileName;
+    $uploadDate = explode('-', $row['uploadDate']);
+    $targetFileFullPath = $row['location'] . '/' . $uploadDate[0] . '/' . $uploadDate[1] . '/' . $uploadDate[2] . '/' . $fileKey . '-' . $fileName;
     $correctPassword = $row['password'];
     if(DEBUG)
         echo '<p>DEBUG: ' . $targetFileFullPath . ' ' . $correctPassword . '</p>';
@@ -42,7 +43,7 @@ if(file_exists($targetFileFullPath)){
                 download($db, pathinfo($fileName, PATHINFO_FILENAME) . '.zip', createzip($targetFileFullPath), $fileKey, true);
             }
             else{
-                download($db, $fileName, $targetFileFullPath, $fileKey, false);
+                download($db, $fileName, $targetFileFullPath, $fileKey);
             }
         }
         else{
@@ -55,7 +56,7 @@ if(file_exists($targetFileFullPath)){
             download($db, pathinfo($fileName, PATHINFO_FILENAME) . '.zip', createzip($targetFileFullPath), $fileKey, true);
         }
         else{
-            download($db, $fileName, $targetFileFullPath, $fileKey, false);
+            download($db, $fileName, $targetFileFullPath, $fileKey);
         }
     }
 }

@@ -92,9 +92,10 @@ if(move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $targetFileFullPath))
     }
 		
 	// Inserting into DB
-	$statement = $db -> prepare('INSERT INTO file (keycode, filename, password, uploadDate, lastView, deleteCode, size)	VALUES(:keycode, :filename, :password, :uploadDate, :lastView, :deleteCode, :size)');
-    $statement -> execute(array('keycode' => $fileKey, 'filename' => $fileName, 'password' => $optionalPassword, 'uploadDate' => date('Y-m-d'), 'lastView' => date('Y-m-d'), 'deleteCode' => $fileDeleteCode, 'size' => humanFilesize(filesize($targetFileFullPath))));
+	$statement = $db -> prepare('INSERT INTO file (keycode, filename, password, uploadDate, lastView, location, deleteCode, size)	VALUES(:keycode, :filename, :password, :uploadDate, :lastView, :location, :deleteCode, :size)');
+    $statement -> execute(array('keycode' => $fileKey, 'filename' => $fileName, 'password' => $optionalPassword, 'uploadDate' => date('Y-m-d'), 'lastView' => date('Y-m-d'), 'location' => dirname($targetFileFullPath, 4), 'deleteCode' => $fileDeleteCode, 'size' => humanFilesize(filesize($targetFileFullPath))));
     // KEYLENGTH + 1 since name is in format fileKey-fileName
+    // dirname($targetFileFullPath, 4): lose 'yyyy/mm/dd/'
 
     if(DEBUG){
         echo '<p>DEBUG: ' . $fileKey . ' ' . $fileName . ' ' . $optionalPassword . ' ' . date('Y-m-d') . ' ' . $fileDeleteCode . ' ' . humanFilesize(filesize($targetFileFullPath));

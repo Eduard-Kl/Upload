@@ -24,7 +24,7 @@ if(isset($_POST['submitChecked'])){
 if(isset($_POST['submitRemoved'])){
 
 	// Set removed to true. Checked is also true
-	$statement = $db -> prepare('UPDATE report SET removed =  1, checked = 1 WHERE id = :id');
+	$statement = $db -> prepare('UPDATE report SET removed = 1, checked = 1 WHERE id = :id');
 	$statement -> execute(array('id' => $_POST['fileID']));
 	
 	if(DEBUG){
@@ -32,8 +32,8 @@ if(isset($_POST['submitRemoved'])){
 	}
 }
 
-// Number of new reports
-$statement = $db -> query('SELECT COUNT(*) FROM report WHERE checked  = 0');
+// Number of unhandled reports
+$statement = $db -> query('SELECT COUNT(*) FROM report WHERE checked = 0');
 echo '<p>Unhandled reports: ' . $statement->fetchColumn() . '.</p>';
 
 // Fetch reports

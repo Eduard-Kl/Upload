@@ -1,4 +1,5 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
@@ -59,16 +60,16 @@ if( $_FILES['fileToUpload']['name'] == '' && $_FILES['fileToUpload']['type'] == 
 // With extension
 $fileName = basename($_FILES["fileToUpload"]["name"]);
 
+$optionalPassword = '';
 if(isset($_POST["optionalPassword"])){
     $optionalPassword = $_POST["optionalPassword"];
 }
 
-if(checkFile() === false){
+if(!checkFile()){
     exit();
 }
 
 // Open database connection
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 $db = DB::getConnection();
 
 // Generate unique file key and unique delete code
@@ -85,10 +86,7 @@ if(DEBUG)
 if(move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $targetFileFullPath)){
     
     if(isset($_POST['removeMetadata'])){
-        $utput = shell_exec('exiftool -all= "' . $targetFileFullPath . '" -overwrite_original');
-        if(DEBUG){
-            echo '<p>DEBUG: metadata removed. Status: ' . $output . '</p>';
-        }
+        shell_exec('exiftool -all= "' . $targetFileFullPath . '" -overwrite_original');
     }
 		
 	// Inserting into DB

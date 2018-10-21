@@ -1,4 +1,5 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
@@ -11,11 +12,10 @@ else{
 }
 
 // Open database connection
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 $db = DB::getConnection();
 
 // Fetch from database (get file info based on $fileKey)
-$statement = $db -> prepare("SELECT filename, password, uploadDate, location FROM file WHERE keycode = :fileKey");
+$statement = $db -> prepare('SELECT filename, password, uploadDate, location FROM file WHERE keycode = :fileKey');
 $statement -> execute(array('fileKey' => $fileKey));
 
 foreach($statement->fetchAll() as $row){
@@ -33,7 +33,7 @@ if(file_exists($targetFileFullPath)){
     // Password protected file
     if($correctPassword != null){
 
-        if($correctPassword == $_POST['optionalPassword']){
+        if(isset($_POST['optionalPassword']) && $correctPassword == $_POST['optionalPassword']){
             
             if(DEBUG)
                 echo '<p>DEBUG: ' . $correctPassword . ' ' . $_POST['optionalPassword'] . ' ' . $targetFileFullPath . '</p>';

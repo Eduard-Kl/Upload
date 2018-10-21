@@ -55,10 +55,12 @@ function download($db, $fileName, $targetFileFullPath, $fileKey, $secureDownload
 	// Remove zip file and temp directory
 	if($secureDownload){
 		// $targetFileFullPath is now a .zip containing two files
-		shell_exec('rm "' . $targetFileFullPath . '"');
-		shell_exec('rmdir ' . dirname($targetFileFullPath));
+		//shell_exec('rm "' . $targetFileFullPath . '"');
+		unlink($targetFileFullPath);
+		//shell_exec('rmdir ' . dirname($targetFileFullPath));
+		rmdir(dirname($targetFileFullPath));
 	}
-	
+
 	// Close connection
 	$db = null;
 }
@@ -157,7 +159,8 @@ function createzip($targetFileFullPath){
 	shell_exec('printf "@ ' . basename($targetFileFullPath) . '\n@=' . substr(basename($targetFileFullPath), KEYLENGTH + 1) . '\n" | zipnote -w ' . $zip);
 
 	// Remove dummy file
-	shell_exec('rm "' . $dummy . '"');
+	//shell_exec('rm "' . $dummy . '"');
+	unlink($dummy);
 	
 	writeLog("SDOWN\t" . $targetFileFullPath);
 
@@ -166,4 +169,32 @@ function createzip($targetFileFullPath){
 
 function e($x){
 	return htmlspecialchars($x, ENT_QUOTES, 'UTF-8');
+}
+
+function delete($db, $fileKey){	
+
+	// Fetch from database (get file info based on $fileKey)
+	$statement = $db -> prepare('SELECT filename, uploadDate, location FROM file WHERE keycode = :keycode');
+	$statement -> execute(array('keycode' => $fileKey));
+
+	foreach($statement->fetchAll() as $row){
+		$fileName = $row['filename'];
+		$uploadDate = explode('-', $row['uploadDate']);
+		$targetFileFullPath = $row['location'] . '/' . $uploadDate[0] . '/' . $uploadDate[1] . '/' . $uploadDate[2] . '/' . $fileKey . '-' . $fileName;
+		if(DEBUG)
+			echo '<p>DEBUG: ' . $targetFileFullPath . ' ' . $correctPassword . '</p>';
+	}
+
+	// Delete from database
+    $statement = $db -> prepare('DELETE FROM file WHERE keycode = :keycode');
+	$statement -> execute(array('keycode' => $fileKey));
+    
+    if(DEBUG)
+        echo '<p>DEBUG: ' . $targetFileFullPath . ' is being deleted.</p>';
+	
+	// Delete from drive
+	if(file_exists($targetFileFullPath) && unlink($targetFileFullPath) == true){
+		echo '<p>File ' . e($fileName) . ' has been deleted.</p>';
+		writeLog("DEL\t" . $targetFileFullPath);
+	}
 }

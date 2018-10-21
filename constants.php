@@ -14,8 +14,13 @@ define('LOCATIONLENGTH', 191);
 define('LINKLENGTH', 191);
 define('NAMELENGTH', 40);
 
+// report functionality
+define('INFOLENGTH', 10000);
+
 //define('KB', 1024);
 //define('MB', 1048576);
 //define('GB', 1073741824);
 //define('TB', 1099511627776);
 //define('MAXFILESIZE', 1*GB);
+
+define('MAXFILESIZESTRING', '1 GB');

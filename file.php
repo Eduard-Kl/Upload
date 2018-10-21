@@ -1,4 +1,5 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
@@ -11,7 +12,6 @@ else{
 }
 
 // Open database connection
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 $db = DB::getConnection();
 
 // Fetch from database (find $fileName, $correctPassword, $size based on $fileKey)

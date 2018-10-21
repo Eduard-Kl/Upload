@@ -1,4 +1,5 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
@@ -36,8 +37,8 @@ function checkInput(){
 	}
 
 	// Check info length
-	if(strlen($_POST['info']) > 65535){
-		echo '<p>Your message cannot exceed 65535 characters.</p>';
+	if(strlen($_POST['info']) > INFOLENGTH){
+		echo '<p>Your message cannot exceed ' . INFOLENGTH . ' characters.</p>';
 		return false;
 	}
 	
@@ -57,7 +58,7 @@ function checkInput(){
 	<br>
 	
 	Your name:
-	<input type="textbox" name="name" value="<?php echo $_POST['name'];?>"/>
+	<input type="textbox" name="name" value="<?php echo e($_POST['name']);?>"/>
 	<br>
 	
 	Your message: *
@@ -74,8 +75,7 @@ function checkInput(){
 // Button 'Report' was clicked and all information is ok
 if(isset($_POST['submitButton']) && checkInput() === true){
 	
-	// Open database connection
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
+	// Open database connection	
 	$db = DB::getConnection();
 	
 	// Inserting into DB

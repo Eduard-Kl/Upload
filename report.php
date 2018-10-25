@@ -73,7 +73,7 @@ function checkInput(){
 <?php
 
 // Button 'Report' was clicked and all information is ok
-if(isset($_POST['submitButton']) && checkInput() === true){
+if( isset($_POST['submitButton']) && checkInput() ){
 	
 	// Open database connection	
 	$db = DB::getConnection();

@@ -15,7 +15,7 @@ else{
 $db = DB::getConnection();
 
 // Fetch from database (find $fileName, $correctPassword, $size based on $fileKey)
-$statement = $db -> prepare("SELECT filename, password, size FROM file WHERE keycode = :fileKey");
+$statement = $db -> prepare('SELECT filename, password, size FROM file WHERE keycode = :fileKey');
 $statement -> execute(array('fileKey' => $fileKey));
 
 foreach($statement->fetchAll() as $row){
@@ -31,6 +31,8 @@ foreach($statement->fetchAll() as $row){
 if($row['filename'] == null ){
     exit('File you are looking for doesn\'t exist.');
 }
+
+writeLog("VIEW\t" . $targetFileFullPath);
 
 // File info
 echo '<p>' . e($fileName) . ' ' . $size . '</p>';

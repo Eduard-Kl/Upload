@@ -18,10 +18,11 @@ $db = DB::getConnection();
 $statement = $db -> prepare('SELECT filename, password, uploadDate, location FROM file WHERE keycode = :fileKey');
 $statement -> execute(array('fileKey' => $fileKey));
 
+$targetFileFullPath = '';
+
 foreach($statement->fetchAll() as $row){
     $fileName = $row['filename'];
-    $uploadDate = explode('-', $row['uploadDate']);
-    $targetFileFullPath = $row['location'] . '/' . $uploadDate[0] . '/' . $uploadDate[1] . '/' . $uploadDate[2] . '/' . $fileKey . '-' . $fileName;
+    $targetFileFullPath = $row['location'] . superExplode('-', $row['uploadDate']) . $fileKey . '-' . $fileName;
     $correctPassword = $row['password'];
     if(DEBUG)
         echo '<p>DEBUG: ' . $targetFileFullPath . ' ' . $correctPassword . '</p>';

@@ -5,7 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
 ?>
 
 <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="post" enctype="multipart/form-data">
-    <input type="textbox" name="filesToDelete" checked/>
+    <input type="textbox" name="filesToDelete"/>
     <input type="submit" name="submitDelete" value="Delete files"/>
 </form>
 

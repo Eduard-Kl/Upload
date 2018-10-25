@@ -39,7 +39,7 @@ if( isset($_GET['code']) && !isset($_POST['submitDelete']) ){
 	<form action="<?php echo e($_GET['code']);?>" method="post" enctype="multipart/form-data">
 		<p>Are you sure you want to delete the file	<?php echo e($fileName);?>?</p>
 		<input type="submit" name="submitDelete" value="Delete file"/>
-		<input type="hidden" name="keycode" value="<?php echo e($fileKey);?>"/>
+		<input type="hidden" name="keycode" value="<?php echo $fileKey;?>"/>
 	</form>
 <?php
 }

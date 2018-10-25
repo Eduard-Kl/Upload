@@ -179,8 +179,7 @@ function delete($db, $fileKey){
 
 	foreach($statement->fetchAll() as $row){
 		$fileName = $row['filename'];
-		$uploadDate = explode('-', $row['uploadDate']);
-		$targetFileFullPath = $row['location'] . '/' . $uploadDate[0] . '/' . $uploadDate[1] . '/' . $uploadDate[2] . '/' . $fileKey . '-' . $fileName;
+		$targetFileFullPath = $row['location'] . superExplode('-', $row['uploadDate']) . $fileKey . '-' . $fileName;
 		if(DEBUG)
 			echo '<p>DEBUG: ' . $targetFileFullPath . ' ' . $correctPassword . '</p>';
 	}
@@ -193,8 +192,17 @@ function delete($db, $fileKey){
         echo '<p>DEBUG: ' . $targetFileFullPath . ' is being deleted.</p>';
 	
 	// Delete from drive
-	if(file_exists($targetFileFullPath) && unlink($targetFileFullPath) == true){
+	if( file_exists($targetFileFullPath) && unlink($targetFileFullPath) ){
 		echo '<p>File ' . e($fileName) . ' has been deleted.</p>';
 		writeLog("DEL\t" . $targetFileFullPath);
 	}
+}
+
+// Takes date in format 2000-01-01. Returns /2000/01/01/
+function superExplode($delimeter, $date){
+
+	// $date = 2000-01-01
+	$x = explode($delimeter, $date);
+
+	return '/' . $x[0] . '/' . $x[1] . '/' . $x[2] . '/';
 }

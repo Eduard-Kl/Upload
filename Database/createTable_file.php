@@ -23,7 +23,7 @@ $sql = 'CREATE TABLE file (
     size VARCHAR(10) NOT NULL,
     PRIMARY KEY(keycode))';
 
-if ($conn->query($sql) === TRUE) {
+if ($conn->query($sql)) {
     echo 'Table "file" created successfully.';
 } else {
     echo 'Error creating table: ' . $conn->error;

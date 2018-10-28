@@ -113,4 +113,3 @@ if(move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $targetFileFullPath))
     // File is too big. Auto check via php.ini
     exit('Sorry, there was an error uploading your file.');
 }
-?>

@@ -7,7 +7,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
 // Check given information in textboxes
 function checkInput(){
 	
-	if($_POST['link'] == '' || $_POST['info'] == ''){
+	if($_POST['link'] == '' || $_POST['info'] == '' || $_POST['name'] == ''){
 		echo '<p>Please fill out the required forms.</p>';
 		return false;
 	}
@@ -57,7 +57,7 @@ function checkInput(){
 	<input type="password" name="optionalPassword"/>
 	<br>
 	
-	Your name:
+	Your name: *
 	<input type="textbox" name="name" value="<?php echo e($_POST['name']);?>"/>
 	<br>
 	

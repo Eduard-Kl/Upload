@@ -4,6 +4,24 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/databaseInfo.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
 
+function writePath($fileKey){
+	
+	global $textOnlyLink, $statementFile;
+	
+	// Already prepared
+	$statementFile -> execute(array('fileKey' => $fileKey));
+
+	// Unique
+	foreach($statementFile->fetchAll() as $rowFile){
+		// File exists
+		if($rowFile['fileName'] != ''){
+			$textOnlyLink = false;
+			$targetFileFullPath= $rowFile['location'] . superExplode('-', $rowFile['uploadDate']) . $fileKey . '-' . e($rowFile['fileName']);
+			echo '<td><font color="white">"' . $targetFileFullPath . '"</font></td>';
+		}
+	}
+}
+
 // Open database connection
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Database/DB.php';
 $db = DB::getConnection();
@@ -12,7 +30,7 @@ $db = DB::getConnection();
 if(isset($_POST['submitChecked'])){
 
 	// Set checked to true
-	$statement = $db -> prepare('UPDATE report SET checked =  1 WHERE id = :id');
+	$statement = $db -> prepare('UPDATE report SET checked = 1 WHERE id = :id');
 	$statement -> execute(array('id' => $_POST['fileID']));
 	
 	if(DEBUG){
@@ -53,32 +71,17 @@ echo '</tr>';
 foreach($statement->fetchAll() as $row){
 
 	$textOnlyLink = true;
-	echo '<form action="' . $_SERVER['PHP_SELF'] . '" method="post" enctype="multipart/form-data"><tr>';
-	echo '<td>' . $row['id'] . '</td>';
-	
+	echo '<tr><td>' . $row['id'] . '</td>';
+
 	// Preffered format. $row['link'] is in format 123456
-	if( preg_match('/[0-9]{' . KEYLENGTH . '}/', $row['link']) ){
-
-		// Already prepared
-		$statementFile -> execute(array('fileKey' => $row['link']));
-
-		// Unique
-		foreach($statementFile->fetchAll() as $rowFile){
-			// File exists
-			if($rowFile['fileName'] != ''){
-				$textOnlyLink = false;
-				$targetFileFullPath= $rowFile['location'] . superExplode('-', $rowFile['uploadDate']) . $row['link'] . '-' . e($rowFile['fileName']);
-				echo '<td><font color="white">"' . $targetFileFullPath . '"</font></td>';
-			}
-		}
+	if( preg_match('/^[0-9]{' . KEYLENGTH . '}/', $row['link']) ){		
+		writePath($row['link']);
 	}
 	
 	// Also acceptable. $row['link'] is in format https://.../file/123456
-	elseif( preg_match('https://*/file/[0-9]{' . KEYLENGTH . '}*', $row['link']) ){
-
-		//... To do
-
-		$textOnlyLink = false;
+	// /i means case-insensitive
+	elseif( preg_match('/(https:\/\/)[a-z]*\/(file)\/[0-9]{' . KEYLENGTH . '}/i', $row['link']) ){
+		writePath(substr($row['link'], -KEYLENGTH));
 	}
 	
 	// General format. Could be any text
@@ -92,12 +95,11 @@ foreach($statement->fetchAll() as $row){
 	echo '<td>' . substr(e($row['info']), 0, 255) . '</td>';
 	echo '<td>' . $row['reportDate'] . '</td>';
 	
-	echo '<td><input type="submit" name="submitChecked" value="Check"/></td>';	
-	echo '<td><input type="submit" name="submitRemoved" value="Remove"/></td>';
-	
-	echo '<td><input type="hidden" name="fileID" value="' . $row['id'] . '"/></td>';
-	
-	echo '</tr></from>';
+	echo '<td><form action="' . $_SERVER['PHP_SELF'] . '" method="post" enctype="multipart/form-data">';
+	echo 	'<input type="submit" name="submitChecked" value="Check"/>';	
+	echo 	'<input type="submit" name="submitRemoved" value="Remove"/>';	
+	echo 	'<input type="hidden" name="fileID" value="' . $row['id'] . '"/>';
+	echo '</form></td></tr>';
 }
 echo '</table>';
 

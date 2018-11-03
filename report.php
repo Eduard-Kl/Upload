@@ -58,7 +58,7 @@ function checkInput(){
 	<br>
 	
 	Your name: *
-	<input type="textbox" name="name" value="<?php echo e($_POST['name']);?>"/>
+	<input type="text" name="name" value="<?php echo e($_POST['name']);?>"/>
 	<br>
 	
 	Your message: *

@@ -18,6 +18,7 @@ $sql = 'CREATE TABLE report (
     name VARCHAR(' . NAMELENGTH . '),
     info TEXT NOT NULL,
     reportDate DATETIME NOT NULL,
+    handleDate DATETIME,
     checked BOOL DEFAULT 0 NOT NULL,
     removed BOOL DEFAULT 0 NOT NULL,
     PRIMARY KEY(id))';

@@ -30,8 +30,8 @@ $db = DB::getConnection();
 if(isset($_POST['submitChecked'])){
 
 	// Set checked to true
-	$statement = $db -> prepare('UPDATE report SET checked = 1 WHERE id = :id');
-	$statement -> execute(array('id' => $_POST['fileID']));
+	$statement = $db -> prepare('UPDATE report SET checked = 1, handleDate = :handleDate WHERE id = :id');
+	$statement -> execute(array('id' => $_POST['fileID'], 'handleDate' => date('Y-m-d H:i:s')));
 	
 	if(DEBUG){
 		echo '<p>DEBUG: report ' . $_POST['fileID'] . ' checked.</p>';
@@ -42,8 +42,8 @@ if(isset($_POST['submitChecked'])){
 if(isset($_POST['submitRemoved'])){
 
 	// Set removed to true. Checked is also true
-	$statement = $db -> prepare('UPDATE report SET removed = 1, checked = 1 WHERE id = :id');
-	$statement -> execute(array('id' => $_POST['fileID']));
+	$statement = $db -> prepare('UPDATE report SET removed = 1, checked = 1, handleDate = :handleDate WHERE id = :id');
+	$statement -> execute(array('id' => $_POST['fileID'], 'handleDate' => date('Y-m-d H:i:s')));
 	
 	if(DEBUG){
 		echo '<p>DEBUG: report ' . $_POST['fileID'] . ' removed.</p>';

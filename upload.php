@@ -4,30 +4,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/constants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/helperFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/head.php';
 
-function generateRandomKey(){
-
-    global $db;
-	
-    // Repeat until unique $key is generated
-    do{
-        $a = rand(0,9);
-        $b = rand(0,9);
-        $c = rand(0,9);
-        $d = rand(0,9);
-        $e = rand(0,9);
-        $f = rand(0,9);
-        $key = "".$a.$b.$c.$d.$e.$f;
-		
-        // Fetch from database. Does a file with $key already exist?
-        $statement = $db -> prepare('SELECT COUNT(*) FROM file WHERE keycode = :fileKey');
-        $statement -> execute(array('fileKey' => $key));
-        
-        $dataExists = $statement->fetchColumn();
-    } while($dataExists >= 1);
-    
-    return $key;
-}
-
 function checkFile(){
 	
 	global $fileName, $optionalPassword;

@@ -3,4 +3,4 @@
 $DBservername = 'localhost';
 $DBusername = 'root';
 $DBpassword = '';
-$DBname = '';
+$DBname = 'myDB';

@@ -24,3 +24,5 @@ define('INFOLENGTH', 10000);
 //define('MAXFILESIZE', 1*GB);
 
 define('MAXFILESIZESTRING', '1 GB');
+
+define('DOMAIN', 'http://127.0.0.1/');
